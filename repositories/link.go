@@ -10,6 +10,8 @@ type LinkRepository interface {
 	CreateLInk(link models.Link) (models.Link, error)
 	FindUserLink(userID int) ([]models.Link, error)
 	GetLink(unique_link string) (models.Link, error)
+	DeleteLink(link models.Link, unique_link string) (models.Link, error)
+	UpdateLink(link models.Link, unique_link string) (models.Link, error)
 }
 
 func RepositoriesLink(db *gorm.DB) *repository {
@@ -24,14 +26,25 @@ func (r *repository) CreateLInk(link models.Link) (models.Link, error) {
 
 func (r *repository) FindUserLink(userID int) ([]models.Link, error) {
 	var links []models.Link
-	err := r.db.Find(&links, "user_id = ?", userID).Error
+	err := r.db.Preload("User").Preload("SocialMedia").Find(&links, "user_id = ?", userID).Error
 
 	return links, err
 }
 
 func (r *repository) GetLink(unique_link string) (models.Link, error) {
-	var link models.Link
-	err := r.db.First(&link, unique_link).Error
+	var links models.Link
+	err := r.db.Preload("User").Preload("SocialMedia").First(&links, "unique_link=?", unique_link).Error
 
+	return links, err
+}
+
+func (r *repository) UpdateLink(link models.Link, unique_link string) (models.Link, error) {
+	err := r.db.Model(&link).Where("unique_link=?", unique_link).Updates(&link).Error
+
+	return link, err
+}
+
+func (r *repository) DeleteLink(link models.Link, unique_link string) (models.Link, error) {
+	err := r.db.Delete(&link).Error
 	return link, err
 }

@@ -1,8 +1,8 @@
 package socialmediadto
 
-type socialMediaRequest struct {
+type SocialMediaRequest struct {
 	LinkID          int    `json:"link_id"`
-	socialMediaName string `jsom:"social_media_name"`
+	SocialMediaName string `jsom:"social_media_name"`
 	Url             string `json:"url"`
 	Image           string `json:"image"`
 }

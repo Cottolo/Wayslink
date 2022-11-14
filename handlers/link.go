@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"os"
 	linkdto "server/dto/link"
@@ -44,6 +43,7 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 		UserID:      userId,
 		Template:    request.Template,
 		Image:       filename,
+		Visit:       0,
 		UniqueLink:  uniquelink.GenerateUniqueLink(),
 	}
 
@@ -59,6 +59,7 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 		Title:       data.Title,
 		Description: data.Description,
 		Image:       data.Image,
+		Visit:       data.Visit,
 		Template:    data.Template,
 		UniqueLink:  data.UniqueLink,
 	}
@@ -90,7 +91,9 @@ func (h *handlerLink) FindUserLink(w http.ResponseWriter, r *http.Request) {
 			Title:       link.Title,
 			Description: link.Description,
 			Image:       filePath + link.Image,
+			Visit:       link.Visit,
 			Template:    link.Template,
+			UserID:      link.UserID,
 			UniqueLink:  link.UniqueLink,
 		})
 	}
@@ -113,19 +116,84 @@ func (h *handlerLink) GetLink(w http.ResponseWriter, r *http.Request) {
 	}
 
 	filePath := os.Getenv("PATH_FILE")
-	fmt.Println(filePath)
 
-	previewResponse := linkdto.LinkResponse{
+	Response := linkdto.LinkResponse{
 		ID:          link.ID,
 		Title:       link.Title,
 		Description: link.Description,
 		Image:       filePath + link.Image,
+		Visit:       link.Visit,
 		Template:    link.Template,
+		UserID:      link.UserID,
 		UniqueLink:  link.UniqueLink,
 	}
 
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Code: http.StatusOK, Data: previewResponse}
+	response := dto.SuccessResult{Code: http.StatusOK, Data: Response}
 	json.NewEncoder(w).Encode(response)
+}
 
+func (h *handlerLink) DeleteLink(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	unique_link := mux.Vars(r)["unique_link"]
+
+	link, err := h.LinkRepository.GetLink(unique_link)
+
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	data, err := h.LinkRepository.DeleteLink(link, unique_link)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Code: http.StatusOK, Data: data}
+	json.NewEncoder(w).Encode(response)
+}
+
+func (h *handlerLink) UpdateLink(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	request := new(linkdto.LinkRequest)
+	if err := json.NewDecoder(r.Body).Decode(&request); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	unique_link := mux.Vars(r)["unique_link"]
+
+	link, err := h.LinkRepository.GetLink(unique_link)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		response := dto.ErrorResult{Code: http.StatusBadRequest, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	if request.Visit != 0 {
+		link.Visit = request.Visit
+	}
+
+	updatelink, err := h.LinkRepository.UpdateLink(link, unique_link)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Code: http.StatusOK, Data: updatelink}
+	json.NewEncoder(w).Encode(response)
 }

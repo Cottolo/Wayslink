@@ -5,4 +5,5 @@ type LinkRequest struct {
 	Description string `json:"description"`
 	Image       string `json:"image"`
 	Template    string `json:"template"`
+	Visit       int    `json:"visit"`
 }

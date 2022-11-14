@@ -6,26 +6,25 @@ import (
 	"gorm.io/gorm"
 )
 
-type SosmedRepository interface {
-	CreateSosmed(socialMedia models.SocialMedia) (models.SocialMedia, error)
+type SocialMediaRepository interface {
+	CreateSocialMedia(socialMedia models.SocialMedia) (models.SocialMedia, error)
 	GetSocialMedia(linkID int) ([]models.SocialMedia, error)
 }
 
-func RepositorySosmed(db *gorm.DB) *repository {
+func RepositorySocialMedia(db *gorm.DB) *repository {
 	return &repository{db}
 }
 
-func (r *repository) CreateSosmed(sosmed models.SocialMedia) (models.SocialMedia, error) {
-	err := r.db.Create(&sosmed).Error
+func (r *repository) CreateSocialMedia(socialMedia models.SocialMedia) (models.SocialMedia, error) {
+	err := r.db.Create(&socialMedia).Error
 
-	return sosmed, err
-
+	return socialMedia, err
 }
 
-func (r *repository) FindSosmedsByLinkID(linkID int) ([]models.SocialMedia, error) {
-	var sosmeds []models.SocialMedia
+func (r *repository) GetSocialMedia(linkID int) ([]models.SocialMedia, error) {
+	var socialMedias []models.SocialMedia
 
-	err := r.db.Find(&sosmeds, "link_id = ?", linkID).Error
+	err := r.db.Find(&socialMedias, "link_id = ?", linkID).Error
 
-	return sosmeds, err
+	return socialMedias, err
 }

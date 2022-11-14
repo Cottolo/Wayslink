@@ -65,8 +65,14 @@ func (h *handlerAuth) Register(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(response)
 	}
 
+	registerResponse := authdto.AuthResponse{
+		ID:       data.ID,
+		Email:    data.Email,
+		FullName: data.FullName,
+	}
+
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Code: http.StatusOK, Data: data}
+	response := dto.SuccessResult{Code: http.StatusOK, Data: registerResponse}
 	json.NewEncoder(w).Encode(response)
 }
 
@@ -117,6 +123,7 @@ func (h *handlerAuth) Login(w http.ResponseWriter, r *http.Request) {
 		FullName: user.FullName,
 		Email:    user.Email,
 		Token:    token,
+		ID:       user.ID,
 	}
 
 	w.Header().Set("Content-Type", "application/json")

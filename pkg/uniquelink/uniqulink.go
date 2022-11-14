@@ -22,6 +22,6 @@ func String(length int) string {
 }
 
 func GenerateUniqueLink() string {
-	result := String(30)
+	result := String(7)
 	return result
 }
