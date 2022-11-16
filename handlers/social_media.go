@@ -57,15 +57,19 @@ func (h *handlerSocialMedia) CreateSocialMedia(w http.ResponseWriter, r *http.Re
 	}
 
 	var ctx = context.Background()
-	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
-	var API_KEY = os.Getenv("API_KEY")
-	var API_SECRET = os.Getenv("API_SECRET")
+	// var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	// var API_KEY = os.Getenv("API_KEY")
+	// var API_SECRET = os.Getenv("API_SECRET")
+	var CLOUD_NAME = "dhtuf2uie"
+	var API_KEY = "261795218548971"
+	var API_SECRET = "Vi1u3vbz3Ex5e93BWnKMEzaAgT8"
 
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
 	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "wayslink"})
 	if err != nil {
 		fmt.Println(err.Error())
+		return
 	}
 
 	data, err := h.SocialMediaRepository.CreateSocialMedia(socialMedia)
@@ -73,6 +77,7 @@ func (h *handlerSocialMedia) CreateSocialMedia(w http.ResponseWriter, r *http.Re
 		w.WriteHeader(http.StatusInternalServerError)
 		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
 		json.NewEncoder(w).Encode(response)
+		return
 	}
 
 	socialMediaResponse := socialmediadto.SocialMediaResponse{
