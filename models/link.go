@@ -9,7 +9,7 @@ type Link struct {
 	Template      string                `json:"template"`
 	Visit         int                   `json:"visit"`
 	SocialMedia   []SocialMediaResponse `json:"social_media" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	SocialMediaID int                   `json:"social_media-id"`
+	SocialMediaID int                   `json:"social_media_id"`
 	UserID        int                   `json:"user_id"`
 	User          UserResponse          `json:"user" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
