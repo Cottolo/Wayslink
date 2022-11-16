@@ -101,24 +101,8 @@ func (h *handlerLink) FindUserLink(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(err.Error())
 	}
 
-	linksResponse := make([]linkdto.LinkResponse, 0)
-
-	filePath := os.Getenv("PATH_FILE")
-
-	for _, link := range link {
-		linksResponse = append(linksResponse, linkdto.LinkResponse{
-			ID:          link.ID,
-			Title:       link.Title,
-			Description: link.Description,
-			Image:       filePath + link.Image,
-			Visit:       link.Visit,
-			Template:    link.Template,
-			UserID:      link.UserID,
-			UniqueLink:  link.UniqueLink,
-		})
-	}
 	w.WriteHeader(http.StatusOK)
-	response := dto.SuccessResult{Code: http.StatusOK, Data: linksResponse}
+	response := dto.SuccessResult{Code: http.StatusOK, Data: link}
 	json.NewEncoder(w).Encode(response)
 }
 
