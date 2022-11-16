@@ -56,9 +56,9 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var ctx = context.Background()
-	var CLOUD_NAME = "dj2zuoyjz"
-	var API_KEY = "823843693691955"
-	var API_SECRET = "CYh1diS0jMTEAxPNP4yPeYj69UQ"
+	var CLOUD_NAME = "dhtuf2uie"
+	var API_KEY = "261795218548971"
+	var API_SECRET = "Vi1u3vbz3Ex5e93BWnKMEzaAgT8"
 
 	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
 
