@@ -132,6 +132,7 @@ console.log(formData);
     }
   };  
 
+  console.log(socmedForm);
   return (
     <div className={styleCSS.createLinkContent}>
       <div className={styleCSS.createLinkHeader}>
@@ -197,10 +198,10 @@ console.log(formData);
                             }
                             alt="link image"
                           />
-                          <label htmlFor="imageS">Upload</label>
+                          <label htmlFor="imageSocmed">Upload</label>
                           <input
                             type="file"
-                            id="image"
+                            id="imageSocmed"
                             name="image"
                             className="d-none"
                             onChange={handleChangeSocmed}
