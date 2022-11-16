@@ -18,5 +18,6 @@ func LinkRoutes(r *mux.Router) {
 	r.HandleFunc("/link/{unique_link}", h.GetLink).Methods("GET")
 	r.HandleFunc("/link/{unique_link}", middleware.Auth(h.DeleteLink)).Methods("DELETE")
 	r.HandleFunc("/link/{unique_link}", h.UpdateLink).Methods("PATCH")
+	r.HandleFunc("/edite-link/{unique_link}", middleware.Auth(middleware.UploadFile(h.EditeLink))).Methods("PATCH")
 
 }

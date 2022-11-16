@@ -16,5 +16,6 @@ func SocialMediaRoutes(r *mux.Router) {
 	h := handlers.HandlerSocialMedia(socialMediaRepository)
 
 	r.HandleFunc("/social-media", middleware.Auth(middleware.UploadFile(h.CreateSocialMedia))).Methods("POST")
+	r.HandleFunc("/social-media/{id}", middleware.Auth(middleware.UploadFile(h.EditeSocialMedia))).Methods("PATCH")
 	r.HandleFunc("/social-media/{link_id}", h.GetSocialMedia).Methods("GET")
 }

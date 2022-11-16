@@ -12,6 +12,7 @@ type LinkRepository interface {
 	GetLink(unique_link string) (models.Link, error)
 	DeleteLink(link models.Link, unique_link string) (models.Link, error)
 	UpdateLink(link models.Link, unique_link string) (models.Link, error)
+	EditeLink(link models.Link, unique_link string) (models.Link, error)
 }
 
 func RepositoriesLink(db *gorm.DB) *repository {
@@ -39,6 +40,12 @@ func (r *repository) GetLink(unique_link string) (models.Link, error) {
 }
 
 func (r *repository) UpdateLink(link models.Link, unique_link string) (models.Link, error) {
+	err := r.db.Model(&link).Where("unique_link=?", unique_link).Updates(&link).Error
+
+	return link, err
+}
+
+func (r *repository) EditeLink(link models.Link, unique_link string) (models.Link, error) {
 	err := r.db.Model(&link).Where("unique_link=?", unique_link).Updates(&link).Error
 
 	return link, err

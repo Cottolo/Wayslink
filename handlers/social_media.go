@@ -99,3 +99,42 @@ func (h *handlerSocialMedia) GetSocialMedia(w http.ResponseWriter, r *http.Reque
 	response := dto.SuccessResult{Code: http.StatusOK, Data: socialMediaResponse}
 	json.NewEncoder(w).Encode(response)
 }
+
+func (h *handlerSocialMedia) EditeSocialMedia(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	socmedImage := r.Context().Value("dataFile")
+	fileName := socmedImage.(string)
+
+	request := socialmediadto.SocialMediaRequest{
+		SocialMediaName: r.FormValue("social_media_name"),
+		Url:             r.FormValue("url"),
+	}
+
+	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	socmed := models.SocialMedia{}
+
+	if request.SocialMediaName != "" {
+		socmed.SocialMediaName = request.SocialMediaName
+	}
+	if request.Url != "" {
+		socmed.Url = request.Url
+	}
+	if fileName != "" {
+		socmed.Image = fileName
+	}
+
+	editelink, err := h.SocialMediaRepository.EditeSocialMedia(socmed, id)
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		response := dto.ErrorResult{Code: http.StatusInternalServerError, Message: err.Error()}
+		json.NewEncoder(w).Encode(response)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	response := dto.SuccessResult{Code: http.StatusOK, Data: editelink}
+	json.NewEncoder(w).Encode(response)
+}

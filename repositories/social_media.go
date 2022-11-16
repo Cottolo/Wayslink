@@ -9,6 +9,7 @@ import (
 type SocialMediaRepository interface {
 	CreateSocialMedia(socialMedia models.SocialMedia) (models.SocialMedia, error)
 	GetSocialMedia(linkID int) ([]models.SocialMedia, error)
+	EditeSocialMedia(socialMedia models.SocialMedia, ID int) (models.SocialMedia, error)
 }
 
 func RepositorySocialMedia(db *gorm.DB) *repository {
@@ -27,4 +28,10 @@ func (r *repository) GetSocialMedia(linkID int) ([]models.SocialMedia, error) {
 	err := r.db.Find(&socialMedias, "link_id = ?", linkID).Error
 
 	return socialMedias, err
+}
+
+func (r *repository) EditeSocialMedia(socialMedia models.SocialMedia, ID int) (models.SocialMedia, error) {
+	err := r.db.Model(&socialMedia).Where("id=?", ID).Updates(&socialMedia).Error
+
+	return socialMedia, err
 }
