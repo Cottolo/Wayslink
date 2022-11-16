@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	dto "server/dto/result"
@@ -10,6 +12,8 @@ import (
 	"server/repositories"
 	"strconv"
 
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 	"github.com/go-playground/validator/v10"
 	"github.com/gorilla/mux"
 )
@@ -24,9 +28,9 @@ func HandlerSocialMedia(SocialMediaRepository repositories.SocialMediaRepository
 
 func (h *handlerSocialMedia) CreateSocialMedia(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	// get file name
-	dataContext := r.Context().Value("dataFile")
-	filename := dataContext.(string)
+
+	dataContex := r.Context().Value("dataFile")
+	filepath := dataContex.(string)
 
 	linkID, _ := strconv.Atoi(r.FormValue("link_id"))
 
@@ -49,7 +53,19 @@ func (h *handlerSocialMedia) CreateSocialMedia(w http.ResponseWriter, r *http.Re
 		LinkID:          request.LinkID,
 		SocialMediaName: request.SocialMediaName,
 		Url:             request.Url,
-		Image:           filename,
+		Image:           filepath,
+	}
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "wayslink"})
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	data, err := h.SocialMediaRepository.CreateSocialMedia(socialMedia)
@@ -63,7 +79,7 @@ func (h *handlerSocialMedia) CreateSocialMedia(w http.ResponseWriter, r *http.Re
 		LinkID:          data.LinkID,
 		SocialMediaName: data.SocialMediaName,
 		Url:             data.Url,
-		Image:           data.Image,
+		Image:           resp.SecureURL,
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -103,8 +119,11 @@ func (h *handlerSocialMedia) GetSocialMedia(w http.ResponseWriter, r *http.Reque
 func (h *handlerSocialMedia) EditeSocialMedia(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	socmedImage := r.Context().Value("dataFile")
-	fileName := socmedImage.(string)
+	filepath := ""
+	dataContex := r.Context().Value("dataFile")
+	if dataContex != nil {
+		filepath = dataContex.(string)
+	}
 
 	request := socialmediadto.SocialMediaRequest{
 		SocialMediaName: r.FormValue("social_media_name"),
@@ -112,6 +131,21 @@ func (h *handlerSocialMedia) EditeSocialMedia(w http.ResponseWriter, r *http.Req
 	}
 
 	id, _ := strconv.Atoi(mux.Vars(r)["id"])
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "dumbmerch"})
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
 
 	socmed := models.SocialMedia{}
 
@@ -121,8 +155,8 @@ func (h *handlerSocialMedia) EditeSocialMedia(w http.ResponseWriter, r *http.Req
 	if request.Url != "" {
 		socmed.Url = request.Url
 	}
-	if fileName != "" {
-		socmed.Image = fileName
+	if filepath != "" {
+		socmed.Image = resp.SecureURL
 	}
 
 	editelink, err := h.SocialMediaRepository.EditeSocialMedia(socmed, id)

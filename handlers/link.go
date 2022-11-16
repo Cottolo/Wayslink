@@ -1,7 +1,9 @@
 package handlers
 
 import (
+	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 	linkdto "server/dto/link"
@@ -9,6 +11,9 @@ import (
 	"server/models"
 	"server/pkg/uniquelink"
 	"server/repositories"
+
+	"github.com/cloudinary/cloudinary-go/v2"
+	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 
 	"github.com/golang-jwt/jwt/v4"
 	"github.com/gorilla/mux"
@@ -28,8 +33,11 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 	userInfo := r.Context().Value("userInfo").(jwt.MapClaims)
 	userId := int(userInfo["id"].(float64))
 
-	dataContext := r.Context().Value("dataFile")
-	filename := dataContext.(string)
+	// dataContext := r.Context().Value("dataFile")
+	// filename := dataContext.(string)
+
+	dataContex := r.Context().Value("dataFile")
+	filepath := dataContex.(string)
 
 	request := linkdto.LinkRequest{
 		Title:       r.FormValue("title"),
@@ -42,9 +50,21 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 		Description: request.Description,
 		UserID:      userId,
 		Template:    request.Template,
-		Image:       filename,
+		Image:       filepath,
 		Visit:       0,
 		UniqueLink:  uniquelink.GenerateUniqueLink(),
+	}
+
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "wayslink"})
+	if err != nil {
+		fmt.Println(err.Error())
 	}
 
 	data, err := h.LinkRepository.CreateLInk(link)
@@ -58,7 +78,7 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 		ID:          data.ID,
 		Title:       data.Title,
 		Description: data.Description,
-		Image:       data.Image,
+		Image:       resp.SecureURL,
 		Visit:       data.Visit,
 		Template:    data.Template,
 		UniqueLink:  data.UniqueLink,
@@ -201,8 +221,12 @@ func (h *handlerLink) UpdateLink(w http.ResponseWriter, r *http.Request) {
 func (h *handlerLink) EditeLink(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	linkImage := r.Context().Value("dataFile")
-	fileName := linkImage.(string)
+	filepath := ""
+
+	dataContex := r.Context().Value("dataFile")
+	if dataContex != nil {
+		filepath = dataContex.(string)
+	}
 
 	request := linkdto.LinkRequest{
 		Title:       r.FormValue("title"),
@@ -219,14 +243,29 @@ func (h *handlerLink) EditeLink(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var ctx = context.Background()
+	var CLOUD_NAME = os.Getenv("CLOUD_NAME")
+	var API_KEY = os.Getenv("API_KEY")
+	var API_SECRET = os.Getenv("API_SECRET")
+
+	// Add your Cloudinary credentials ...
+	cld, _ := cloudinary.NewFromParams(CLOUD_NAME, API_KEY, API_SECRET)
+
+	// Upload file to Cloudinary ...
+	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "dumbmerch"})
+
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+
 	if request.Title != "" {
 		link.Title = request.Title
 	}
 	if request.Description != "" {
 		link.Description = request.Description
 	}
-	if fileName != "" {
-		link.Image = fileName
+	if filepath != "" {
+		link.Image = resp.SecureURL
 	}
 
 	updatelink, err := h.LinkRepository.EditeLink(link, unique_link)
