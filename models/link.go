@@ -1,17 +1,17 @@
 package models
 
 type Link struct {
-	ID          int                   `json:"id" gorm:"primary_key:auto_increment"`
-	Title       string                `json:"title" gorm:"type:varchar(255)"`
-	Description string                `json:"description" gorm:"type:varchar(255)"`
-	UniqueLink  string                `json:"unique_link"`
-	Image       string                `json:"image" gorm:"type:varchar(255)"`
-	Template    string                `json:"template"`
-	Visit       int                   `json:"visit"`
-	Socmed_id   int                   `json:"socmed_id"`
-	SocialMedia []SocialMediaResponse `json:"social_media" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
-	UserID      int                   `json:"user_id"`
-	User        UserResponse          `json:"user" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	ID            int                   `json:"id" gorm:"primary_key:auto_increment"`
+	Title         string                `json:"title" gorm:"type:varchar(255)"`
+	Description   string                `json:"description" gorm:"type:varchar(255)"`
+	UniqueLink    string                `json:"unique_link"`
+	Image         string                `json:"image" gorm:"type:varchar(255)"`
+	Template      string                `json:"template"`
+	Visit         int                   `json:"visit"`
+	SocialMedia   []SocialMediaResponse `json:"social_media" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	SocialMediaID int                   `json:"social_media-id"`
+	UserID        int                   `json:"user_id"`
+	User          UserResponse          `json:"user" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
 }
 
 type LinkResponse struct {

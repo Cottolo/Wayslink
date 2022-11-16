@@ -5,8 +5,8 @@ type User struct {
 	FullName string         `json:"full_name" gorm:"type:varchar(255)"`
 	Email    string         `json:"email" gorm:"type:varchar(255)"`
 	Password string         `json:"-" gorm:"type:varchar(255)"`
-	LinkID   int            `json:"link_id"`
 	Link     []LinkResponse `json:"link" gorm:"constraint:OnUpdate:CASCADE,OnDelete:CASCADE;"`
+	LinkID   int            `json:"link_id"`
 }
 
 type UserResponse struct {
