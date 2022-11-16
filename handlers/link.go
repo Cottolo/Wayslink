@@ -36,7 +36,7 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 	// dataContext := r.Context().Value("dataFile")
 	// filename := dataContext.(string)
 
-	dataContex := r.Context().Value("dataFile")
+	dataContex := r.Context().Value("	")
 	filepath := dataContex.(string)
 
 	request := linkdto.LinkRequest{
@@ -65,6 +65,7 @@ func (h *handlerLink) CreateLInk(w http.ResponseWriter, r *http.Request) {
 	resp, err := cld.Upload.Upload(ctx, filepath, uploader.UploadParams{Folder: "wayslink"})
 	if err != nil {
 		fmt.Println(err.Error())
+		return
 	}
 
 	data, err := h.LinkRepository.CreateLInk(link)
