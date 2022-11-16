@@ -1,11 +1,9 @@
 import React from "react";
 import { Container, Row, Col, Card } from "react-bootstrap";
-import { Link, Navigate, useNavigate } from "react-router-dom";
-import chessImg from "../../assets/Chess.png";
 import { API } from "../../config/api";
 
 const Template = ({ title, description, image, dataSocmed, unique_link,visit}) => {
-  const navigate = useNavigate()
+  
   const handleAddVisit = async ({socmed}) => {
     // e.preventDefault();
     try {
@@ -29,8 +27,8 @@ const Template = ({ title, description, image, dataSocmed, unique_link,visit}) =
               <img
                 src={image}
                 style={{ objectFit: "cover", borderRadius: "50%" }}
-                width="150"
-                height={150}
+                width="110"
+                height={110}
               />
               <h3 className="fw-bold mt-3">{title}</h3>
               <p className="w-100 fs-4 text-center">{description}</p>
@@ -43,7 +41,7 @@ const Template = ({ title, description, image, dataSocmed, unique_link,visit}) =
                   <a
                     href={socmed.url}
                     target="_blank"
-                    className="rounded bg-dark d-flex w-100 py-1 px-2 align-items-center justify-content-start text-decoration-none mb-3"
+                    className="rounded bg-dark d-flex w-100 px-2 align-items-center justify-content-start text-decoration-none mb-3"
                     key={socmed.id}
 
                   >

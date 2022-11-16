@@ -33,7 +33,7 @@ const SideNavbar= () => {
                         <img src={user} alt="profile" /><Link to="/profile">Profile</Link>
                     </li>
                     <li className="">
-                        <img src={chain} alt="My Links" /><Link to="/myLinks">My Links</Link>
+                        <img src={chain} alt="My Links" /><Link to="/my-link">My Links</Link>
                     </li>
                 </ul>
             </div>

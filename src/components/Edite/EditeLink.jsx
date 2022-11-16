@@ -4,26 +4,42 @@ import { API } from "../../config/api";
 import { UserContext } from "../../context/userContext";
 import Phone from "../../assets/Phone1.png";
 import Chess from "../../assets/Chess.png";
-import { useNavigate } from "react-router-dom";
-import { Alert } from "react-bootstrap";
+import { useNavigate, useParams } from "react-router-dom";
+import { Alert, CloseButton, NavItem } from "react-bootstrap";
 
-const CreateLink = ({ template }) => {
+const EditeLink = ({ unique_link }) => {
   
-  const [showSocmed, setShowSocmed] = useState(false);
   const [message, setMessage] = useState(null);
 
   const navigate = useNavigate();
   const [linkID, setLinkID] = useState("");
   
   // LINK
-  
+  const [dataLink,setDataLink] = useState([])
+
+  const getLink = async () => {
+    try {
+      const config= {
+        headers: {
+            Authorization : `Bearer ${localStorage.token}`,
+        }
+    }
+      const response = await API.get(`/link/${unique_link}`,config);
+      setDataLink(response.data.data);
+      getSocmed(response.data.data.id)
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+
   const [preview, setPreview] = useState(null);
   const [formLink, setformLink] = useState({
     title: "",
     description: "",
     image: "",
-    template,
   });
+
 
   const onChangeLink = (e) => {
     setformLink({
@@ -41,7 +57,7 @@ const CreateLink = ({ template }) => {
   };
 
   // Submit Link
-  const handleSubmitLink = async (e) => {
+  const handleEditeLink = async (e) => {
     try {
       e.preventDefault();
       const config = {
@@ -56,19 +72,30 @@ const CreateLink = ({ template }) => {
       formData.set("title", formLink.title);
       formData.set("description", formLink.description);
       formData.set("image", formLink.image[0], formLink.image[0].name);
-      formData.set("template", template);
+      // formData.set("template", template);
 
-      const response = await API.post("/link", formData, config);
-      console.log(response);
-console.log(formData);
-        setShowSocmed(true);
-        setLinkID(response.data.data.id);
+      const response = await API.patch(`/edite-link/${unique_link}`, formData, config);
+      console.log("RESPONSE",response);
+      console.log("FORM DATA",formData);
+      setLinkID(response.data.data.id);
+      setformLink({
+        title : "",
+        description:"",
+        image:""
+      })
+
+      const alert = (
+        <Alert variant="success" className="py-1">
+          Succes to Edite
+        </Alert>
+      );
+      setMessage(alert);
      
     } catch (error) {
       console.log(error);
       const alert = (
         <Alert variant="danger" className="py-1">
-          Failed
+         Please Select Image
         </Alert>
       );
       setMessage(alert);
@@ -77,6 +104,17 @@ console.log(formData);
 
 
   // SOCMED
+  const [dataSocmed, setDataSocmed] = useState([])
+
+  const getSocmed = async (linkId) => {
+    try {
+      const response = await API.get(`/social-media/${linkId}`);
+      setDataSocmed(response.data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const [imageSocmedPreview, setImageSocmedPreview] = useState(null);
   const [socmedForm, setSocmedForm] = useState({
     social_media_name: "",
@@ -96,13 +134,15 @@ console.log(formData);
       let url = URL.createObjectURL(e.target.files[0]);
       setImageSocmedPreview(url);
     }
+
+    console.log("form",socmedForm);
   };
 
   
-  // Submit Socmed
-  const handleSubmitSocmed = async (e) => {
+  // EDITE SOCMED
+  const handleEditeSocmed = async (socmedId) => {
     try {
-      e.preventDefault();
+      // e.preventDefault();
       const config = {
         headers: {
           "Content-Type": "multipart/form-data",
@@ -116,7 +156,7 @@ console.log(formData);
       formData.set("url", socmedForm.url);
       formData.set("image", socmedForm.image[0], socmedForm.image[0].name);
       
-      const response = await API.post("/social-media", formData, config);
+      const response = await API.patch(`/social-media/${socmedId}`, formData, config);
       console.log("somed response", response);
       
       setSocmedForm({
@@ -132,6 +172,13 @@ console.log(formData);
     }
   };  
 
+  useEffect(()=>{
+    getLink()
+  },[])
+  // console.log("FORM LINK", formLink);
+  console.log("FORM SOCMED",socmedForm);
+  console.log("SOCMED ID",dataSocmed.id);
+
   return (
     <div className={styleCSS.createLinkContent}>
       <div className={styleCSS.createLinkHeader}>
@@ -139,15 +186,15 @@ console.log(formData);
       </div>
       <div className={styleCSS.createLinkForm}>
         <div className={styleCSS.createLinkFormTop}>
-          <p>Create Link</p>
+          <p>Edite Link</p>
           
         </div>
         <div className={styleCSS.createLinkFormBottom}>
           <div className={styleCSS.createLinkFormInput}>
             <div className={styleCSS.formLink}>
-              <form onSubmit={handleSubmitLink}>
+              <form onSubmit={handleEditeLink}>
                 <div className={styleCSS.preview}>
-                  {preview != null? <img className="w-50 h-50" src={preview} alt="Preview" />: <img src={Chess}/>}
+                  {preview != null? <img className="w-50 h-50" src={preview} alt="Preview" />: <img className="w-50" src={dataLink.image}/>}
                   <div>
                     <label style={{cursor:"pointer"}} className="bgYellow mt-3 py-1 px-4 fw-bold text-light rounded-2" htmlFor="image">Upload</label>
                   </div>
@@ -166,8 +213,8 @@ console.log(formData);
                     name="title"
                     onChange={onChangeLink}
                     value={formLink.title}
+                    placeholder={dataLink.title}
                     autoComplete="off"
-                    required
                   />
                   <label htmlFor="description">Description</label>
                   <input
@@ -175,32 +222,36 @@ console.log(formData);
                     name="description"
                     onChange={onChangeLink}
                     value={formLink.description}
+                    placeholder={dataLink.description}
                     autoComplete="off"
-                    required
                   />
                   <div className="mt-3">
+                    {message && message}
                     <button className={styleCSS.addLinkButton} type="submit">
-                      Publish Link
+                      Save Link
                     </button>
                   </div>
                 </div>
               </form>
-              {showSocmed && (
+
+              {/* SOCMED FORM */}
+              
                 <>
-                  <div className={styleCSS.secondInput}>
+                {dataSocmed?.map((socmed,index)=>(
+                  <div key={index} className={styleCSS.secondInput}>
                     <div className={styleCSS.linksCard}>
-                      <form id="sosmedForm" onSubmit={handleSubmitSocmed}>
+                      <form id="sosmedForm" onSubmit={()=>handleEditeSocmed(socmed.id)}>
                         <div className={styleCSS.linkImage}>
                           <img
                             src={
-                              imageSocmedPreview ? imageSocmedPreview : Chess
+                              imageSocmedPreview ? imageSocmedPreview : socmed.image
                             }
                             alt="link image"
                           />
                           <label htmlFor="imageS">Upload</label>
                           <input
                             type="file"
-                            id="image"
+                            id="imageS"
                             name="image"
                             className="d-none"
                             onChange={handleChangeSocmed}
@@ -213,9 +264,9 @@ console.log(formData);
                             id="social_media_name"
                             name="social_media_name"
                             autoComplete="off"
-                            required
                             onChange={handleChangeSocmed}
                             value={socmedForm.social_media_name}
+                            placeholder={socmed.social_media_name}
                           />
                           <label htmlFor="url">Link</label>
                           <input
@@ -223,8 +274,7 @@ console.log(formData);
                             id="url"
                             name="url"
                             autoComplete="off"
-                            required
-                            placeholder="ex: http://instagram.com/beematch6"
+                            placeholder={socmed.url}
                             onChange={handleChangeSocmed}
                             value={socmedForm.url}
                           />
@@ -233,13 +283,13 @@ console.log(formData);
                           className={styleCSS.addLinkButton}
                           type="submit"
                         >
-                          Add new Link
+                          Save Link
                         </button>
                       </form>
                     </div>
                   </div>
+                ))}
                 </>
-              ) } 
             </div>
           </div>
           <div className={styleCSS.createLinkFormTemplatePreview}>
@@ -251,4 +301,4 @@ console.log(formData);
   );
 };
 
-export default CreateLink;
+export default EditeLink;

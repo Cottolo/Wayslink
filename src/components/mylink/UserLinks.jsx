@@ -54,6 +54,10 @@ const UserLinksContentPage = ({visitor}) => {
     navigate("/wayslink/" + uniqueLink);
   };
 
+  const editeLink = (uniqueLink) => {
+    navigate("/edite-link/" + uniqueLink);
+  };
+
   // Delete Data
   const [uniqueLinkDelete, setUniqueLinkDelete] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(null);
@@ -63,20 +67,20 @@ const UserLinksContentPage = ({visitor}) => {
 
   const [query, setQuery] = useState("")
 
-  const deleteLink = async (e) => {
-    e.preventDefault()
-    try {
-    const config= {
-            headers: {
-                Authorization : `Bearer ${localStorage.token}`,
-            }
-    }
-    await API.delete(`/link/${dataLink.id}`,config);
+  // const deleteLink = async (e) => {
+  //   e.preventDefault()
+  //   try {
+  //   const config= {
+  //           headers: {
+  //               Authorization : `Bearer ${localStorage.token}`,
+  //           }
+  //   }
+  //   await API.delete(`/link/${dataLink.id}`,config);
     
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+  // };
 
   const handleDelete = (uniqueLink) => {
     setUniqueLinkDelete(uniqueLink);
@@ -125,7 +129,6 @@ const UserLinksContentPage = ({visitor}) => {
       <div>
       {dataLink?.filter((item)=>{return query.toLocaleLowerCase() === '' ? item : item.title.toLocaleLowerCase().includes(query);
       }).map((item, index)=>(
-        // {dataLink?.map((item, index) => (
           <div className={styleCSS.userLinksList} key={index}>
             <img
               src={item.image}
@@ -151,6 +154,7 @@ const UserLinksContentPage = ({visitor}) => {
               />
               <img src={Edit} 
                 className="ms-2"
+                onClick={()=> editeLink(item.unique_link) }
                 style={{width:"50px", height: "50px" }}
               alt="Edit" />
               <img

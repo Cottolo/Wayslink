@@ -2,10 +2,10 @@ import React from "react";
 import styleCSS from "./InsertPage.module.css";
 import SideNavbar from "../../components/sidebar/sidebar";
 import { useParams } from "react-router-dom";
-import CreateLink from "../../components/Create/CreateLink";
+import EditeLink from "../../components/Edite/EditeLink";
 
-const InsertPage = () => {
-  const { template } = useParams();
+const EditePage = () => {
+  const { unique_link } = useParams();
 
   return (
     <div className={styleCSS.insertPageMainContent}>
@@ -13,10 +13,10 @@ const InsertPage = () => {
         <SideNavbar />
       </div>
       <div className={styleCSS.insertPageRightSide}>
-        <CreateLink template={template} />
+        <EditeLink unique_link={unique_link} />
       </div>
     </div>
   );
 };
 
-export default InsertPage;
+export default EditePage;

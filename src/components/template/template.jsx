@@ -27,7 +27,7 @@ const Template = () => {
           <img
             src={phone1}
             alt="template 1"
-            onClick={() => navigate("/insertLink/phone1")}
+            onClick={() => navigate("/insert-link/phone1")}
           />
         </div>
        
