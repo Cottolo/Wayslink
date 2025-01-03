@@ -135,7 +135,7 @@ const LandingPage = () => {
     }
 
     return (
-        <div className='bgYellow'>
+        <div className='bgYellow vh-100'>
             <div className='bgGray py-3 d-flex justify-content-between px-4'>
                 <div >
                     <img src={icon} alt="icon" />
